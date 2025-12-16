@@ -1,249 +1,287 @@
 <!DOCTYPE html>
 <html lang="vi">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Thiệp Giáng Sinh 3D</title>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thiệp Giáng Sinh 3D</title>
 
-        <style>
-            * { box-sizing: border-box; }
+<style>
+* { box-sizing: border-box; }
 
-            body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at top, #0b1d2a, #000);
-            overflow: hidden;
-            font-family: 'Segoe UI', sans-serif;
-            }
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at top, #0b1d2a, #000);
+    overflow: hidden;
+    font-family: 'Segoe UI', sans-serif;
+}
 
-            /* ===== 3D Scene ===== */
-            .scene { perspective: 1200px; }
+/* ===== 3D Scene ===== */
+.scene { perspective: 1200px; }
 
-            .envelope-wrapper {
-            width: 340px;
-            height: 230px;
-            position: relative;
-            transform-style: preserve-3d;
-            cursor: pointer;
-            transition: transform 1s ease;
-            }
+.envelope-wrapper {
+    width: 340px;
+    height: 230px;
+    position: relative;
+    transform-style: preserve-3d;
+    cursor: pointer;
+    transition: transform 1s ease;
+}
 
-            .envelope-wrapper.open { transform: rotateX(15deg); }
+.envelope-wrapper.open { transform: rotateX(15deg); }
 
-            /* ===== Glow ===== */
-            .glow {
-            position: absolute;
-            inset: -25px;
-            background: radial-gradient(circle, rgba(255,215,160,.7), transparent 70%);
-            filter: blur(30px);
-            opacity: 0;
-            transition: opacity 1s ease;
-            }
+/* ===== Glow ===== */
+.glow {
+    position: absolute;
+    inset: -25px;
+    background: radial-gradient(circle, rgba(255,215,160,.7), transparent 70%);
+    filter: blur(30px);
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+.open .glow { opacity: 1; }
 
-            .open .glow { opacity: 1; }
+/* ===== Envelope ===== */
+.envelope {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #b71c1c, #e53935);
+    border-radius: 10px;
+    box-shadow: 0 30px 60px rgba(0,0,0,.6);
+    overflow: hidden;
+    position: relative;
+}
 
-            /* ===== Envelope ===== */
-            .envelope {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #b71c1c, #e53935);
-            border-radius: 10px;
-            box-shadow: 0 30px 60px rgba(0,0,0,.6);
-            overflow: hidden;
-            position: relative;
-            }
+.flap {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #ff5252, #ff1744);
+    clip-path: polygon(0 0, 100% 0, 50% 55%);
+    transform-origin: top;
+    transition: transform 1s cubic-bezier(.2,.8,.2,1);
+    z-index: 3;
+}
+.open .flap { transform: rotateX(180deg); }
 
-            .flap {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #ff5252, #ff1744);
-            clip-path: polygon(0 0, 100% 0, 50% 55%);
-            transform-origin: top;
-            transition: transform 1s cubic-bezier(.2,.8,.2,1);
-            z-index: 3;
-            }
+/* ===== Letter ===== */
+.letter {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: -210px;
+    height: 200px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 18px;
+    text-align: center;
+    transform: translateZ(40px);
+    transition: bottom 1s ease .3s;
+}
+.open .letter { bottom: 18px; }
 
-            .open .flap { transform: rotateX(180deg); }
+.letter h1 {
+    margin: 0;
+    font-size: 22px;
+    background: linear-gradient(90deg, gold, white, gold);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 2.5s linear infinite;
+}
 
-            /* ===== Letter ===== */
-            .letter {
-            position: absolute;
-            left: 12px;
-            right: 12px;
-            bottom: -210px;
-            height: 200px;
-            background: #fff;
-            border-radius: 8px;
-            padding: 18px;
-            text-align: center;
-            transform: translateZ(40px);
-            transition: bottom 1s ease .3s;
-            }
+@keyframes shimmer {
+    to { background-position: 200%; }
+}
 
-            .open .letter { bottom: 18px; }
+.letter p {
+    margin: 10px 0 5px;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+}
 
-            .letter h1 {
-            margin: 0;
-            font-size: 22px;
-            background: linear-gradient(90deg, gold, white, gold);
-            background-size: 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shimmer 2.5s linear infinite;
-            }
+/* ===== Signature SVG ===== */
+.signature {
+    width: 100%;
+    margin-top: 6px;
+}
 
-            @keyframes shimmer {
-            to { background-position: 200%; }
-            }
+.signature path {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 
-            .letter p {
-            margin: 10px 0 5px;
-            font-size: 14px;
-            color: #333;
-            line-height: 1.6;
-            }
+    stroke-dasharray: 3000;
+    stroke-dashoffset: 3000;
 
-            /* ===== Calligraphy SVG ===== */
-            .signature {
-            width: 100%;
-            margin-top: 8px;
-            }
+    animation: write 4.5s cubic-bezier(.4,0,.2,1) forwards;
+}
 
-            .signature path {
-            fill: none;
-            stroke: gold;
-            stroke-width: 4;
-            stroke-linecap: round;
-            stroke-dasharray: 1200;
-            stroke-dashoffset: 1200;
-            animation: write 3s ease forwards .8s;
-            }
+@keyframes write {
+    to { stroke-dashoffset: 0; }
+}
 
-            @keyframes write {
-            to { stroke-dashoffset: 0; }
-            }
+/* ===== Hint ===== */
+.hint {
+    position: absolute;
+    bottom: -45px;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    opacity: .8;
+    font-size: 13px;
+}
 
-            /* ===== Hint ===== */
-            .hint {
-            position: absolute;
-            bottom: -45px;
-            width: 100%;
-            text-align: center;
-            color: #fff;
-            opacity: .8;
-            font-size: 13px;
-            }
+/* ===== Snow ===== */
+.snow {
+    position: fixed;
+    top: -10px;
+    color: white;
+    animation: fall linear infinite;
+    opacity: .9;
+    pointer-events: none;
+}
 
-            /* ===== Snow ===== */
-            .snow {
-            position: fixed;
-            top: -10px;
-            color: white;
-            animation: fall linear infinite;
-            opacity: .9;
-            pointer-events: none;
-            }
+@keyframes fall {
+    to { transform: translateY(110vh); }
+}
 
-            @keyframes fall {
-            to { transform: translateY(110vh); }
-            }
+/* ===== Spark Firework ===== */
+.spark {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle, #fff, gold);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: spark 1.2s ease-out forwards;
+}
 
-            /* ===== Spark Firework ===== */
-            .spark {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: radial-gradient(circle, #fff, gold);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: spark 1.2s ease-out forwards;
-            }
+@keyframes spark {
+    to {
+        transform: translate(var(--x), var(--y)) scale(0);
+        opacity: 0;
+    }
+}
+</style>
+</head>
 
-            @keyframes spark {
-            to {
-                transform: translate(var(--x), var(--y)) scale(0);
-                opacity: 0;
-            }
-            }
-        </style>
-    </head>
+<body>
 
-    <body>
+<div class="scene">
+    <div class="envelope-wrapper" id="env">
+        <div class="glow"></div>
 
-        <div class="scene">
-        <div class="envelope-wrapper" id="env">
-            <div class="glow"></div>
-
-            <div class="envelope">
+        <div class="envelope">
             <div class="flap"></div>
 
             <div class="letter">
                 <h1 id="title">🎄 Merry Christmas 🎄</h1>
 
                 <p>
-                Chúc bạn một mùa Noel<br>
-                ấm áp – an lành – hạnh phúc ✨
+                    Chúc bạn một mùa Noel<br>
+                    ấm áp – an lành – hạnh phúc ✨
                 </p>
 
-                <!-- SVG chữ viết tay -->
-                <svg class="signature" viewBox="0 0 600 120">
-                <path d="M50,80 C60,40 90,30 110,70 C130,110 160,110 180,70 C200,30 230,40 240,80 M270,80 Q270,50 290,40 Q310,35 320,60 Q330,85 310,95 Q290,105 270,80 M350,80 Q350,50 370,40 Q390,35 400,60 Q410,85 390,95 Q370,105 350,80 M430,60 L430,100 L480,100 L480,60 L430,60 M455,60 L455,100 M510,80 C530,40 570,30 590,70 C610,110 640,110 650,70" />
+                <!-- ===== SIGNATURE SVG (RETRACE LEVEL 2 – ONE PATH) ===== -->
+                <svg class="signature" viewBox="0 0 1200 320">
+                    <defs>
+                        <linearGradient id="ink" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="gold"/>
+                            <stop offset="100%" stop-color="#fff1a8"/>
+                        </linearGradient>
+                    </defs>
+
+                    <path d="
+                        M95 185
+                        C150 60, 300 20, 420 95
+                        C470 125, 515 170, 500 215
+                        C480 270, 400 250, 395 185
+                        C390 110, 520 70, 545 130
+                        C560 165, 510 200, 480 175
+
+                        C510 120, 585 85, 640 105
+                        C690 125, 695 175, 655 195
+
+                        C665 155, 695 115, 735 125
+                        C780 140, 770 185, 735 200
+
+                        C760 165, 800 135, 835 155
+                        C870 175, 855 220, 820 230
+
+                        C845 205, 885 185, 915 205
+                        C950 225, 945 260, 900 265
+
+                        C860 270, 815 265, 780 270
+                        C860 285, 960 285, 1085 260
+                    "
+                    stroke="url(#ink)" />
                 </svg>
-            </div>
-            </div>
 
-            <div class="hint">Click để mở thư ✨</div>
-        </div>
+
+            </div>
         </div>
 
-        <script>
-            const env = document.getElementById('env');
-            const title = document.getElementById('title');
+        <div class="hint">Click để mở thư ✨</div>
+    </div>
+</div>
 
-            env.addEventListener('click', () => {
-            env.classList.toggle('open');
-            if (env.classList.contains('open')) firework(title);
-            });
+<script>
+const env = document.getElementById('env');
+const title = document.getElementById('title');
 
-            /* ===== Firework from text ===== */
-            function firework(el) {
-            const r = el.getBoundingClientRect();
-            const cx = r.left + r.width / 2;
-            const cy = r.top + r.height / 2;
+env.addEventListener('click', () => {
+    env.classList.toggle('open');
+    if (env.classList.contains('open')) firework(title);
+});
 
-            for (let i = 0; i < 24; i++) {
-                const s = document.createElement('div');
-                s.className = 'spark';
+/* ===== Firework from text ===== */
+function firework(el) {
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
 
-                const a = Math.random() * Math.PI * 2;
-                const d = 40 + Math.random() * 60;
+    for (let i = 0; i < 24; i++) {
+        const s = document.createElement('div');
+        s.className = 'spark';
 
-                s.style.left = cx + 'px';
-                s.style.top = cy + 'px';
-                s.style.setProperty('--x', Math.cos(a) * d + 'px');
-                s.style.setProperty('--y', Math.sin(a) * d + 'px');
+        const a = Math.random() * Math.PI * 2;
+        const d = 40 + Math.random() * 60;
 
-                document.body.appendChild(s);
-                setTimeout(() => s.remove(), 1200);
-            }
-            }
+        s.style.left = cx + 'px';
+        s.style.top = cy + 'px';
+        s.style.setProperty('--x', Math.cos(a) * d + 'px');
+        s.style.setProperty('--y', Math.sin(a) * d + 'px');
 
-            /* ===== Snow ===== */
-            function snow() {
-            const s = document.createElement('div');
-            s.className = 'snow';
-            s.innerHTML = '❄';
-            s.style.left = Math.random() * innerWidth + 'px';
-            s.style.fontSize = 10 + Math.random() * 20 + 'px';
-            s.style.animationDuration = 3 + Math.random() * 5 + 's';
-            document.body.appendChild(s);
-            setTimeout(() => s.remove(), 8000);
-            }
-            setInterval(snow, 200);
-        </script>
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 1200);
+    }
+}
 
-    </body>
+/* ===== Snow ===== */
+function snow() {
+    const s = document.createElement('div');
+    s.className = 'snow';
+    s.innerHTML = '❄';
+    s.style.left = Math.random() * innerWidth + 'px';
+    s.style.fontSize = 10 + Math.random() * 20 + 'px';
+    s.style.animationDuration = 3 + Math.random() * 5 + 's';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 8000);
+}
+setInterval(snow, 200);
+
+/* ===== Auto-fit signature stroke ===== */
+document.querySelectorAll('.signature path').forEach(p => {
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+});
+</script>
+
+</body>
 </html>
