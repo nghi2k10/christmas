@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thiệp Giáng Sinh 3D</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #0b1d2a, #000);
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* ===== Wrapper 3D ===== */
+    .scene {
+      perspective: 1200px;
+    }
+
+    .envelope-wrapper {
+      width: 340px;
+      height: 230px;
+      position: relative;
+      transform-style: preserve-3d;
+      cursor: pointer;
+      transition: transform 1s ease;
+    }
+
+    .envelope-wrapper.open {
+      transform: rotateX(15deg);
+    }
+
+    /* ===== Glow ===== */
+    .glow {
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle, rgba(255,215,160,0.6), transparent 70%);
+      filter: blur(25px);
+      opacity: 0;
+      transition: opacity 1s ease;
+      z-index: 0;
+    }
+
+    .open .glow {
+      opacity: 1;
+    }
+
+    /* ===== Envelope ===== */
+    .envelope {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #b71c1c, #e53935);
+      border-radius: 8px;
+      box-shadow: 0 30px 60px rgba(0,0,0,.6);
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* Nắp thư 3D */
+    .flap {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #ff5252, #ff1744);
+      clip-path: polygon(0 0, 100% 0, 50% 55%);
+      transform-origin: top;
+      transform: rotateX(0deg);
+      transition: transform 1s cubic-bezier(.2,.8,.2,1);
+      z-index: 3;
+    }
+
+    .open .flap {
+      transform: rotateX(180deg);
+    }
+
+    /* ===== Letter ===== */
+    .letter {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: -200px;
+      height: 190px;
+      background: #fff;
+      border-radius: 6px;
+      padding: 20px;
+      text-align: center;
+      transform: translateZ(40px);
+      transition: bottom 1s ease 0.3s;
+      z-index: 2;
+    }
+
+    .open .letter {
+      bottom: 20px;
+    }
+
+    .letter h1 {
+      margin: 0;
+      font-size: 22px;
+      background: linear-gradient(90deg, #d32f2f, #ff9800);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 3s infinite linear;
+    }
+
+    .letter p {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    @keyframes shimmer {
+      from { background-position: 0%; }
+      to { background-position: 200%; }
+    }
+
+    /* ===== SVG Tree ===== */
+    .tree {
+      width: 60px;
+      margin: 10px auto 0;
+    }
+
+    .tree path {
+      stroke: #2e7d32;
+      stroke-width: 3;
+      fill: none;
+      stroke-dasharray: 300;
+      stroke-dashoffset: 300;
+      animation: draw 2s ease forwards 1s;
+    }
+
+    @keyframes draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .hint {
+      position: absolute;
+      bottom: -45px;
+      width: 100%;
+      text-align: center;
+      font-size: 13px;
+      color: #fff;
+      opacity: .8;
+    }
+
+    /* Snow */
+    .snow {
+      position: fixed;
+      top: -10px;
+      color: #fff;
+      animation: fall linear infinite;
+      opacity: .9;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(110vh); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scene">
+    <div class="envelope-wrapper" id="env">
+      <div class="glow"></div>
+      <div class="envelope">
+        <div class="flap"></div>
+        <div class="letter">
+          <h1>🎄 Merry Christmas 🎄</h1>
+          <p>
+            Chúc bạn một mùa Noel<br>
+            ấm áp – an lành – hạnh phúc<br>
+            và tràn ngập yêu thương ✨
+          </p>
+
+          <!-- SVG cây thông vẽ nét -->
+          <svg class="tree" viewBox="0 0 64 64">
+            <path d="M32 4 L20 24 H28 L16 44 H26 L12 60 H52 L38 44 H48 L36 24 H44 Z" />
+          </svg>
+        </div>
+      </div>
+      <div class="hint">Click để mở thư ✨</div>
+    </div>
+  </div>
+
+  <script>
+    const env = document.getElementById('env');
+
+    env.addEventListener('click', () => {
+      env.classList.toggle('open');
+    });
+
+    function snow() {
+      const s = document.createElement('div');
+      s.className = 'snow';
+      s.innerHTML = '❄';
+      s.style.left = Math.random() * window.innerWidth + 'px';
+      s.style.fontSize = 10 + Math.random() * 20 + 'px';
+      s.style.animationDuration = 3 + Math.random() * 5 + 's';
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 8000);
+    }
+
+    setInterval(snow, 200);
+  </script>
+</body>
+</html>
